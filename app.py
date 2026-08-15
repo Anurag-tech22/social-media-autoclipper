@@ -158,55 +158,60 @@ st.markdown("""
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     }
     
-    /* Output Shorts Cards */
+    /* Output Shorts Cards with Vibrant Luminous Glow */
     .short-container {
-        background: #111422;
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 20px;
-        padding: 1.4rem;
+        background: radial-gradient(circle at 50% 0%, rgba(35, 45, 75, 0.45) 0%, rgba(15, 18, 30, 0.95) 100%);
+        border: 1px solid rgba(255, 217, 61, 0.25);
+        border-radius: 22px;
+        padding: 1.5rem;
         margin-bottom: 1.5rem;
-        transition: all 0.25s ease;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     .short-container:hover {
-        border-color: rgba(255, 217, 61, 0.45);
-        transform: translateY(-3px);
-        box-shadow: 0 14px 32px rgba(255, 217, 61, 0.1);
+        border-color: #FFD93D;
+        transform: translateY(-4px);
+        box-shadow: 0 0 25px rgba(255, 217, 61, 0.2), 0 15px 40px rgba(0, 0, 0, 0.6);
     }
     
     .hook-tag {
-        display: inline-block;
-        background: linear-gradient(90deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 142, 83, 0.2) 100%);
-        border: 1px solid rgba(255, 107, 107, 0.35);
-        color: #FFA07A;
-        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: linear-gradient(90deg, #FF6B6B 0%, #FF8E53 100%);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #FFFFFF;
+        font-size: 0.82rem;
         font-weight: 800;
-        padding: 0.3rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         border-radius: 8px;
         letter-spacing: 0.03em;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+        box-shadow: 0 0 14px rgba(255, 107, 107, 0.45);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
     
     .score-badge {
-        background: rgba(255, 217, 61, 0.12);
-        border: 1px solid rgba(255, 217, 61, 0.35);
+        background: rgba(255, 217, 61, 0.18);
+        border: 1px solid #FFD93D;
         color: #FFD93D;
-        font-size: 0.82rem;
-        font-weight: 700;
-        padding: 0.3rem 0.75rem;
+        font-size: 0.84rem;
+        font-weight: 800;
+        padding: 0.32rem 0.8rem;
         border-radius: 8px;
+        box-shadow: 0 0 12px rgba(255, 217, 61, 0.25);
     }
     
     .transcript-quote {
-        background: rgba(0, 0, 0, 0.35);
-        border-left: 3px solid #4D96FF;
-        border-radius: 0 8px 8px 0;
-        padding: 0.65rem 0.85rem;
-        font-size: 0.84rem;
-        color: #CBD5E1;
+        background: rgba(0, 0, 0, 0.45);
+        border-left: 3px solid #FFD93D;
+        border-radius: 0 10px 10px 0;
+        padding: 0.75rem 0.95rem;
+        font-size: 0.86rem;
+        color: #E2E8F0;
         font-style: italic;
-        line-height: 1.5;
-        margin: 0.8rem 0;
+        line-height: 1.55;
+        margin: 0.9rem 0;
     }
     
     /* Button enhancements */

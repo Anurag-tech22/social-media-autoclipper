@@ -53,28 +53,44 @@ def create_ass_subtitles(
     clip_end: float,
     output_ass_path: str,
     highlight_color: str = "Yellow",
-    font_size: int = 58,
+    font_size: int = 56,
     hook_title: Optional[str] = None
 ):
     """
     Generate Advanced SubStation Alpha (ASS) subtitles with:
-    1. Word-level animated highlight captions in the lower 35% safe zone.
-    2. Optional top viral hook title banner.
+    1. Word-level animated luminous glowing highlight captions.
+    2. Vibrant top viral hook badge banner with neon accent.
     """
     # Color mapping for ASS (Format: &HAABBGGRR in hex)
     color_map = {
-        "Yellow": "&H0000E5FF&",   # Bright Golden Yellow (BGR: 00 E5 FF)
-        "Cyan": "&H00FFFF00&",     # Vibrant Electric Cyan (BGR: FF FF 00)
-        "White": "&H00FFFFFF&",    # Crisp Pure White
-        "Green": "&H0000FF66&",    # Neon Lime Green
-        "Pink": "&H00FF33FF&"      # Neon Magenta / Pink
+        "Yellow": {
+            "text": "&H0000FFFF&",    # Bright Neon Yellow
+            "glow": "&H0000E5FF&",    # Warm Golden Glow
+        },
+        "Cyan": {
+            "text": "&H00FFFF00&",    # Electric Cyan
+            "glow": "&H00E5E500&",    # Deep Cyan Glow
+        },
+        "White": {
+            "text": "&H00FFFFFF&",    # Pure Crisp White
+            "glow": "&H00CCCCCC&",    # Silver Glow
+        },
+        "Green": {
+            "text": "&H0033FF33&",    # Neon Lime Green
+            "glow": "&H0000CC33&",    # Emerald Glow
+        },
+        "Pink": {
+            "text": "&H00FF33FF&",    # Neon Magenta
+            "glow": "&H00CC00CC&",    # Violet Glow
+        }
     }
     
-    primary_color = "&H00FFFFFF&"
-    active_color = color_map.get(highlight_color, "&H0000E5FF&")
-    outline_color = "&H00000000&" # Pure Black outline
-    shadow_color = "&H90000000&"  # Drop shadow
-
+    cfg = color_map.get(highlight_color, color_map["Yellow"])
+    active_color = cfg["text"]
+    glow_color = cfg["glow"]
+    primary_color = "&H00FFFFFF&" # Crisp white
+    dark_outline = "&H000A0C14&"  # Clean dark edge
+    
     ass_header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: 1080
@@ -84,8 +100,8 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: AutoClip,Arial Black,Arial,{font_size},{primary_color},&H000000FF,{outline_color},{shadow_color},-1,0,0,0,100,100,0,0,1,5.5,3.0,2,60,60,360,1
-Style: HookBanner,Arial Black,Arial,48,&H0000E5FF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,4.5,2.5,8,40,40,160,1
+Style: AutoClip,Arial Black,Arial,{font_size},{primary_color},&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,0,0,1,2.8,0,2,60,60,380,1
+Style: HookBanner,Arial Black,Arial,42,&H00FFFFFF,&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,1,0,1,3.0,0,8,40,40,160,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -93,12 +109,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     
     events = []
     
-    # 1. Add Viral Hook Top Banner if provided
+    # 1. Add Glowing Viral Hook Top Banner if provided
     if hook_title:
         clip_dur = clip_end - clip_start
         banner_end = format_ass_timestamp(clip_dur)
         clean_hook = hook_title.upper()
-        events.append(f"Dialogue: 1,0:00:00.00,{banner_end},HookBanner,,0,0,0,,{{\\an8\\bord4\\fscx102\\fscy102}}{clean_hook}")
+        # Render clean glowing hook badge with gold/cyan glow border
+        events.append(f"Dialogue: 1,0:00:00.00,{banner_end},HookBanner,,0,0,0,,{{\\an8\\bord3.2\\3c{glow_color}\\c{primary_color}\\blur1.5\\fscx102\\fscy102}}{clean_hook}")
 
     # 2. Filter words relevant to this clip interval
     clip_words = [
@@ -107,7 +124,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     ]
     
     if clip_words:
-        # Group words into short punchy phrases (3 to 5 words)
         grouped_phrases: List[List[Dict[str, Any]]] = []
         current_group: List[Dict[str, Any]] = []
         
@@ -141,9 +157,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 for idx, w in enumerate(group):
                     clean_word = w["word"].upper()
                     if idx == current_idx:
-                        line_parts.append(f"{{\\c{active_color}\\b1\\fscx110\\fscy110}}{clean_word}{{\\rAutoClip}}")
+                        # Active word: Luminous Neon Glow effect with slight scale up
+                        line_parts.append(f"{{\\c{active_color}\\b1\\bord3.5\\3c{glow_color}\\blur2\\fscx112\\fscy112}}{clean_word}{{\\rAutoClip}}")
                     else:
-                        line_parts.append(f"{{\\c{primary_color}}}{clean_word}")
+                        # Base word: Crisp clean white with subtle dark border
+                        line_parts.append(f"{{\\c{primary_color}\\bord2.5\\3c{dark_outline}\\blur0.8}}{clean_word}")
                         
                 caption_text = " ".join(line_parts)
                 start_str = format_ass_timestamp(w_start)
