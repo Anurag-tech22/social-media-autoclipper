@@ -5,8 +5,20 @@ import tempfile
 from pathlib import Path
 import streamlit as st
 
+import importlib
+
 # Ensure project root is in sys.path
 sys.path.insert(0, str(Path(__file__).parent))
+
+import src.utils
+import src.downloader
+import src.transcriber
+import src.video_processor
+
+importlib.reload(src.utils)
+importlib.reload(src.downloader)
+importlib.reload(src.transcriber)
+importlib.reload(src.video_processor)
 
 from src.utils import setup_ffmpeg_path, get_temp_dir, format_timestamp
 from src.downloader import download_youtube_video, extract_audio
