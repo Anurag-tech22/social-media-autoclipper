@@ -53,7 +53,7 @@ def create_ass_subtitles(
     clip_end: float,
     output_ass_path: str,
     highlight_color: str = "Yellow",
-    font_size: int = 56,
+    font_size: int = 54,
     hook_title: Optional[str] = None
 ):
     """
@@ -88,8 +88,8 @@ def create_ass_subtitles(
     cfg = color_map.get(highlight_color, color_map["Yellow"])
     active_color = cfg["text"]
     glow_color = cfg["glow"]
-    primary_color = "&H00FFFFFF&" # Crisp white
-    dark_outline = "&H000A0C14&"  # Clean dark edge
+    primary_color = "&H00FFFFFF&"
+    dark_outline = "&H000A0C14&"
     
     ass_header = f"""[Script Info]
 ScriptType: v4.00+
@@ -100,8 +100,8 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: AutoClip,Arial Black,Arial,{font_size},{primary_color},&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,0,0,1,2.8,0,2,60,60,380,1
-Style: HookBanner,Arial Black,Arial,42,&H00FFFFFF,&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,1,0,1,3.0,0,8,40,40,160,1
+Style: AutoClip,Arial Black,Arial,{font_size},{primary_color},&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,0,0,1,2.8,0,2,50,50,260,1
+Style: HookBanner,Arial Black,Arial,42,&H00FFFFFF,&H00000000,{dark_outline},&H00000000,-1,0,0,0,100,100,1,0,1,3.2,0,8,40,40,160,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -114,7 +114,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         clip_dur = clip_end - clip_start
         banner_end = format_ass_timestamp(clip_dur)
         clean_hook = hook_title.upper()
-        # Render clean glowing hook badge with gold/cyan glow border
         events.append(f"Dialogue: 1,0:00:00.00,{banner_end},HookBanner,,0,0,0,,{{\\an8\\bord3.2\\3c{glow_color}\\c{primary_color}\\blur1.5\\fscx102\\fscy102}}{clean_hook}")
 
     # 2. Filter words relevant to this clip interval
@@ -178,14 +177,15 @@ def process_vertical_short(
     words: List[Dict[str, Any]],
     output_path: str,
     highlight_color: str = "Yellow",
-    font_size: int = 58,
+    font_size: int = 54,
     hook_title: Optional[str] = None,
     enable_progress_bar: bool = True,
+    video_layout_mode: str = "Fit (Full View + Blurred Background)",
     target_width: int = 1080,
     target_height: int = 1920
 ) -> str:
     """
-    Cuts video segment, transforms 16:9 into 9:16 centered vertical short,
+    Cuts video segment, transforms into 9:16 vertical short (Fit with blurred bg or Center Crop),
     burns in animated high-contrast captions, top viral hook title, and bottom progress bar.
     """
     ffmpeg_exe = setup_ffmpeg_path()
@@ -208,49 +208,68 @@ def process_vertical_short(
 
     escaped_ass_path = ass_path.replace("\\", "/").replace(":", "\\:")
     
-    # 9:16 Centered Crop Filter + Lanczos scaling + Subtitles + Animated Progress Bar
-    filters = [
-        "crop=ih*9/16:ih:(iw-ih*9/16)/2:0",
-        f"scale={target_width}:{target_height}:flags=lanczos",
-        f"subtitles='{escaped_ass_path}'"
-    ]
+    # Check layout mode: Fit with Blurred BG (Default - 100% full content visible) vs Center Crop
+    is_fit_mode = "Fit" in video_layout_mode or "Full" in video_layout_mode
     
-    # Animated progress bar at bottom of frame (height 14px, glowing gold/cyan)
-    if enable_progress_bar:
-        bar_color = "0xFFD700" if highlight_color == "Yellow" else "0x00E5FF" if highlight_color == "Cyan" else "0xFF3366"
-        # Progress bar width grows proportionally with t: w = (t / duration) * 1080
-        progress_filter = (
-            f"drawbox=y=ih-18:x=0:w='(t/{clip_duration})*1080':h=12:color={bar_color}@0.9:t=fill"
-        )
-        filters.append(progress_filter)
-        
-    vf_filter = ",".join(filters)
-    
-    cmd = [
-        ffmpeg_exe,
-        "-y",
-        "-ss", str(start_time),
-        "-t", str(clip_duration),
-        "-i", input_video_path,
-        "-vf", vf_filter,
-        "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "20",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        "-movflags", "+faststart",
-        output_path
-    ]
+    bar_color = "0xFFD700" if highlight_color == "Yellow" else "0x00E5FF" if highlight_color == "Cyan" else "0xFF3366"
+    progress_cmd = f",drawbox=y=ih-18:x=0:w='(t/{clip_duration})*1080':h=12:color={bar_color}@0.95:t=fill" if enable_progress_bar else ""
 
-    print(f"Rendering Viral 9:16 Short: {output_path} ({start_time:.1f}s - {end_time:.1f}s)...")
+    if is_fit_mode:
+        # Fit mode: Full 16:9 frame in center with blurred dynamic background (No cropping / zooming!)
+        filter_complex = (
+            f"[0:v]split[bg][fg];"
+            f"[bg]scale={target_width}:{target_height}:force_original_aspect_ratio=increase,crop={target_width}:{target_height},boxblur=25:5[bgblur];"
+            f"[fg]scale={target_width}:-2:flags=lanczos[fgsharp];"
+            f"[bgblur][fgsharp]overlay=0:(H-h)/2[base];"
+            f"[base]subtitles='{escaped_ass_path}'{progress_cmd}[out]"
+        )
+        cmd = [
+            ffmpeg_exe,
+            "-y",
+            "-ss", str(start_time),
+            "-t", str(clip_duration),
+            "-i", input_video_path,
+            "-filter_complex", filter_complex,
+            "-map", "[out]",
+            "-map", "0:a?",
+            "-c:v", "libx264",
+            "-preset", "veryfast",
+            "-crf", "20",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-movflags", "+faststart",
+            output_path
+        ]
+    else:
+        # Crop mode: Center 9:16 slice
+        vf_filter = (
+            f"crop=ih*9/16:ih:(iw-ih*9/16)/2:0,"
+            f"scale={target_width}:{target_height}:flags=lanczos,"
+            f"subtitles='{escaped_ass_path}'{progress_cmd}"
+        )
+        cmd = [
+            ffmpeg_exe,
+            "-y",
+            "-ss", str(start_time),
+            "-t", str(clip_duration),
+            "-i", input_video_path,
+            "-vf", vf_filter,
+            "-c:v", "libx264",
+            "-preset", "veryfast",
+            "-crf", "20",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-movflags", "+faststart",
+            output_path
+        ]
+
+    print(f"Rendering Vertical Short ({video_layout_mode}): {output_path}...")
     res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
     if res.returncode != 0:
-        print(f"Warning: Primary render failed, falling back. Stderr: {res.stderr[:250]}")
-        fallback_filter = (
-            f"crop=ih*9/16:ih:(iw-ih*9/16)/2:0,"
-            f"scale={target_width}:{target_height}:flags=lanczos"
-        )
+        print(f"Warning: Primary render failed, attempting fallback. Stderr: {res.stderr[:300]}")
+        # Robust fallback filter
+        fallback_filter = f"crop=ih*9/16:ih:(iw-ih*9/16)/2:0,scale={target_width}:{target_height}"
         cmd_fallback = [
             ffmpeg_exe,
             "-y",

@@ -324,6 +324,14 @@ with st.sidebar:
         format_func=lambda x: f"{x} Seconds {'(TikTok/Story)' if x==15 else '(Standard Short)' if x==30 else '(Deep Dive)'}"
     )
     
+    st.markdown("#### 📱 Video Framing & Layout")
+    video_layout_mode = st.radio(
+        "Aspect Ratio Mode",
+        options=["Fit (Full 100% View + Dynamic Blurred Canvas)", "Center Crop (Zoomed 9:16 Speaker View)"],
+        index=0,
+        help="'Fit' displays 100% of your horizontal screen/video in the center without any zooming or cutoffs, with a dynamic blurred version in the background. 'Center Crop' zooms in on the middle 9:16 slice."
+    )
+    
     st.markdown("#### 🎨 Caption Customization")
     highlight_color = st.selectbox(
         "Active Word Highlight Accent",
@@ -510,7 +518,8 @@ if generate_btn:
                         highlight_color=highlight_color,
                         font_size=font_size,
                         hook_title=hook_to_burn,
-                        enable_progress_bar=enable_progress
+                        enable_progress_bar=enable_progress,
+                        video_layout_mode=video_layout_mode
                     )
                     
                     rendered_clips.append({
