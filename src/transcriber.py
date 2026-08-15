@@ -2,17 +2,18 @@ import os
 import math
 import re
 from typing import List, Dict, Any, Tuple
-import whisper
 from src.utils import setup_ffmpeg_path
 
 # Global model cache to avoid reloading models on every request
 _MODEL_CACHE: Dict[str, Any] = {}
 
 def load_whisper_model(model_name: str = "base"):
-    """Load and cache Whisper model."""
+    """Load and cache Whisper model with lazy import for instant UI responsiveness."""
+    global _MODEL_CACHE
     setup_ffmpeg_path()
     if model_name not in _MODEL_CACHE:
-        print(f"Loading Whisper model '{model_name}'...")
+        print(f"Loading Whisper model '{model_name}' into memory...")
+        import whisper
         _MODEL_CACHE[model_name] = whisper.load_model(model_name)
     return _MODEL_CACHE[model_name]
 

@@ -4,8 +4,15 @@ import shutil
 import tempfile
 from pathlib import Path
 
+_CACHED_FFMPEG = None
+_CACHED_FFPROBE = None
+
 def setup_ffmpeg_path():
-    """Ensure ffmpeg & ffprobe executables are available in PATH and os.environ."""
+    """Ensure ffmpeg & ffprobe executables are available in PATH and os.environ (cached)."""
+    global _CACHED_FFMPEG
+    if _CACHED_FFMPEG and os.path.exists(_CACHED_FFMPEG):
+        return _CACHED_FFMPEG
+
     try:
         import static_ffmpeg
         static_ffmpeg.add_paths()
@@ -30,15 +37,20 @@ def setup_ffmpeg_path():
     except Exception:
         pass
         
-    # Check which ffmpeg executable is active in PATH
     which_ffmpeg = shutil.which("ffmpeg")
-    return which_ffmpeg or "ffmpeg"
+    _CACHED_FFMPEG = which_ffmpeg or "ffmpeg"
+    return _CACHED_FFMPEG
 
 def get_ffprobe_path():
-    """Get the ffprobe executable path."""
+    """Get the ffprobe executable path (cached)."""
+    global _CACHED_FFPROBE
+    if _CACHED_FFPROBE and os.path.exists(_CACHED_FFPROBE):
+        return _CACHED_FFPROBE
+        
     setup_ffmpeg_path()
     which_ffprobe = shutil.which("ffprobe")
-    return which_ffprobe or "ffprobe"
+    _CACHED_FFPROBE = which_ffprobe or "ffprobe"
+    return _CACHED_FFPROBE
 
 def format_timestamp(seconds: float) -> str:
     """Format seconds into HH:MM:SS or MM:SS format."""
