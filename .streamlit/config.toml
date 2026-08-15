@@ -1,0 +1,17 @@
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
+
+[ui]
+hideTopBar = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "dark"
+primaryColor = "#FF6B6B"
+backgroundColor = "#0A0C12"
+secondaryBackgroundColor = "#131722"
+textColor = "#FFFFFF"
+font = "sans serif"
