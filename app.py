@@ -26,16 +26,38 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
-    /* Completely hide Streamlit Deploy button, header bar, hamburger menu, and footer */
+    /* Hide Streamlit Deploy button and menu, while keeping sidebar toggle button clearly visible */
     #MainMenu {visibility: hidden; display: none !important;}
-    header {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
     .stDeployButton {display: none !important;}
-    [data-testid="stToolbar"] {display: none !important; visibility: hidden !important;}
-    [data-testid="stDecoration"] {display: none !important; visibility: hidden !important;}
-    [data-testid="stStatusWidget"] {display: none !important; visibility: hidden !important;}
     .stAppDeployButton {display: none !important;}
     [data-testid="manage-app-button"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    
+    /* Transparent header bar so only the sidebar toggle chevron shows */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+    
+    /* Ensure sidebar toggle button (open/close) is always visible and beautifully styled */
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebarCollapseButton"] {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 999999 !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 10px !important;
+        padding: 6px !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stSidebarCollapsedControl"]:hover,
+    [data-testid="stSidebarCollapseButton"]:hover {
+        background: rgba(255, 107, 107, 0.25) !important;
+        border-color: #FF6B6B !important;
+        box-shadow: 0 0 12px rgba(255, 107, 107, 0.4) !important;
+    }
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;

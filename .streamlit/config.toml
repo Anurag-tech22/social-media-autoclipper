@@ -2,9 +2,6 @@
 showErrorDetails = false
 toolbarMode = "minimal"
 
-[ui]
-hideTopBar = true
-
 [browser]
 gatherUsageStats = false
 
