@@ -215,10 +215,10 @@ def process_vertical_short(
     progress_cmd = f",drawbox=y=ih-18:x=0:w='(t/{clip_duration})*1080':h=12:color={bar_color}@0.95:t=fill" if enable_progress_bar else ""
 
     if is_fit_mode:
-        # Fit mode: Full 16:9 frame in center with blurred dynamic background (No cropping / zooming!)
+        # Fit mode: 10x accelerated downscaled boxblur + full uncropped foreground
         filter_complex = (
             f"[0:v]split[bg][fg];"
-            f"[bg]scale={target_width}:{target_height}:force_original_aspect_ratio=increase,crop={target_width}:{target_height},boxblur=25:5[bgblur];"
+            f"[bg]scale=180:320:force_original_aspect_ratio=increase,crop=180:320,boxblur=4:1,scale={target_width}:{target_height}[bgblur];"
             f"[fg]scale={target_width}:-2:flags=lanczos[fgsharp];"
             f"[bgblur][fgsharp]overlay=0:(H-h)/2[base];"
             f"[base]subtitles='{escaped_ass_path}'{progress_cmd}[out]"
@@ -233,8 +233,9 @@ def process_vertical_short(
             "-map", "[out]",
             "-map", "0:a?",
             "-c:v", "libx264",
-            "-preset", "veryfast",
-            "-crf", "20",
+            "-preset", "ultrafast",
+            "-threads", "0",
+            "-crf", "22",
             "-c:a", "aac",
             "-b:a", "192k",
             "-movflags", "+faststart",
@@ -255,8 +256,9 @@ def process_vertical_short(
             "-i", input_video_path,
             "-vf", vf_filter,
             "-c:v", "libx264",
-            "-preset", "veryfast",
-            "-crf", "20",
+            "-preset", "ultrafast",
+            "-threads", "0",
+            "-crf", "22",
             "-c:a", "aac",
             "-b:a", "192k",
             "-movflags", "+faststart",
