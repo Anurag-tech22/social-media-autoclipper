@@ -244,35 +244,55 @@ with st.sidebar:
 st.markdown("### 📥 1. Select Video Source")
 tab_upload, tab_yt, tab_demo = st.tabs(["📁 Upload MP4 File", "🔗 YouTube Video URL", "🎬 Synthetic Test Demo"])
 
+if "demo_active" not in st.session_state:
+    st.session_state.demo_active = False
+
 video_source_type = None
 uploaded_file = None
 youtube_url = None
-use_demo = False
 
 with tab_upload:
     uploaded_file = st.file_uploader("Drop horizontal 16:9 video (MP4, MOV, MKV)", type=["mp4", "mov", "mkv"])
     if uploaded_file is not None:
         video_source_type = "upload"
+        st.session_state.demo_active = False
 
 with tab_yt:
     youtube_url_input = st.text_input("Enter YouTube Video URL", placeholder="https://www.youtube.com/watch?v=...")
     if youtube_url_input.strip():
         youtube_url = youtube_url_input.strip()
         video_source_type = "youtube"
+        st.session_state.demo_active = False
 
 with tab_demo:
-    st.info("💡 Want to test instantly? Click below to generate a synthetic sample audio-video clip and run the full pipeline in seconds!")
-    if st.button("🧪 Load Synthetic Demo Clip"):
-        use_demo = True
+    st.info("💡 Want to test instantly? Click below to load a synthetic sample audio-video clip and run the full pipeline in seconds!")
+    col_d1, col_d2 = st.columns([1, 2])
+    with col_d1:
+        if st.button("🧪 Select Demo Clip"):
+            st.session_state.demo_active = True
+            st.success("✅ Synthetic demo clip selected!")
+    if st.session_state.demo_active:
         video_source_type = "demo"
+        st.caption("🎬 Active Source: *Synthetic AI Podcast Demo Clip (35s)*")
 
 # Action Button
 st.markdown("---")
 generate_btn = st.button("⚡ Generate Viral Vertical Shorts", type="primary", use_container_width=True)
 
 if generate_btn:
+    # Determine active source
+    if uploaded_file is not None:
+        video_source_type = "upload"
+    elif youtube_url_input.strip():
+        video_source_type = "youtube"
+        youtube_url = youtube_url_input.strip()
+    elif st.session_state.demo_active:
+        video_source_type = "demo"
+    else:
+        video_source_type = None
+
     if not video_source_type:
-        st.error("⚠️ Please provide a video source (upload an MP4 file, enter a YouTube URL, or click the Demo tab) before generating.")
+        st.error("⚠️ Please provide a video source (upload an MP4 file, enter a YouTube URL, or click 'Select Demo Clip' under the Synthetic Test Demo tab) before generating.")
     else:
         progress_box = st.container()
         with progress_box:
