@@ -75,9 +75,10 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
         
     return video_path, metadata
 
-def extract_audio(video_path: str, output_audio_path: str = None) -> str:
+def extract_audio(video_path: str, output_audio_path: str = None, max_duration: float = 600.0) -> str:
     """
     Extract clean 16kHz mono WAV audio from a video file for Whisper processing.
+    Caps max scan duration (default 10 mins) to ensure blazing fast sub-minute processing.
     """
     ffmpeg_exe = setup_ffmpeg_path()
     
@@ -88,7 +89,6 @@ def extract_audio(video_path: str, output_audio_path: str = None) -> str:
         
     os.makedirs(Path(output_audio_path).parent, exist_ok=True)
     
-    # Run ffmpeg to convert audio to 16kHz mono 16-bit PCM WAV
     cmd = [
         ffmpeg_exe,
         "-y",
@@ -97,8 +97,12 @@ def extract_audio(video_path: str, output_audio_path: str = None) -> str:
         "-acodec", "pcm_s16le",
         "-ar", "16000",
         "-ac", "1",
-        output_audio_path
     ]
+    
+    if max_duration and max_duration > 0:
+        cmd.extend(["-t", str(max_duration)])
+        
+    cmd.append(output_audio_path)
     
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode != 0:

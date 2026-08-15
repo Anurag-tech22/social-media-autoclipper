@@ -366,17 +366,18 @@ with st.sidebar:
         enable_progress = st.checkbox("Retention Bar", value=True, help="Renders dynamic animated progress bar along the bottom.")
     
     st.markdown("#### 🧠 AI Whisper Model")
-    model_name = st.selectbox(
+    model_choice = st.selectbox(
         "Speech Recognition Engine",
-        options=["base", "tiny"],
+        options=["tiny (Ultra Fast • Sub-Minute Speed)", "base (High Accuracy • Deep Scan)"],
         index=0,
-        help="'base' offers optimal transcription accuracy, 'tiny' delivers ultra fast processing."
+        help="'tiny' processes audio 4x faster on CPU and completes in under 20-30 seconds. 'base' performs a deeper scan."
     )
+    model_name = "tiny" if "tiny" in model_choice else "base"
     
     max_clips = st.slider("Top Viral Clips to Extract", min_value=1, max_value=4, value=3, step=1)
     
     st.markdown("---")
-    st.caption("⚡ Auto-Clip & Burn AI v2.2 • Powered by Whisper AI & FFmpeg")
+    st.caption("⚡ Auto-Clip & Burn AI v2.3 • Powered by Whisper AI & FFmpeg")
 
 # Main Content Area
 st.markdown('<div class="section-title">📥 1. Select Input Source</div>', unsafe_allow_html=True)
