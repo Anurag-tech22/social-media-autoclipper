@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Clip & Burn AI — Executive Project Blueprint & Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true, theme:'dark'});</script>
+    <style>
+        :root {
+            --bg: #0A0D18;
+            --card-bg: rgba(22, 27, 46, 0.75);
+            --primary: #FF6B6B;
+            --accent: #FFD93D;
+            --cyan: #00E5FF;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2.5rem 1.5rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary) 0%, #FF8E53 100%);
+            color: #fff;
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFD93D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.6rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+        }
+        .metric-box {
+            background: rgba(0,0,0,0.35);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+        .metric-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1.1;
+        }
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        th {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .mermaid {
+            background: rgba(0,0,0,0.35);
+            padding: 1.5rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .tag {
+            background: rgba(255, 217, 61, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .print-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #FF8E53 100%);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 100px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+        }
+        .print-btn:hover { transform: scale(1.05); }
+        @media print {
+            body { background: #FFFFFF; color: #000000; padding: 0; }
+            .card { background: #FFFFFF; border: 1px solid #CCCCCC; color: #000000; box-shadow: none; page-break-inside: avoid; }
+            .card-title { color: #000000; }
+            .metric-box { background: #F8F9FA; border: 1px solid #DDDDDD; }
+            .metric-num { color: #D97706; }
+            .print-btn { display: none; }
+            h1 { color: #111827; -webkit-text-fill-color: initial; background: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">🚀 Devpost Hackathon Official Blueprint</div>
+            <h1>⚡ Auto-Clip & Burn AI</h1>
+            <p class="subtitle">An autonomous, open-source AI media engine that repurposes long-form videos into viral vertical Shorts, Reels, and TikToks in under 45 seconds.</p>
+            <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        </header>
+
+        <!-- Metrics Overview -->
+        <div class="grid-3" style="margin-bottom: 2rem;">
+            <div class="metric-box">
+                <div class="metric-num">98%</div>
+                <div class="metric-label">Time Saved per Video (2h &rarr; 45s)</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-num">$0.00</div>
+                <div class="metric-label">API / Cloud Infrastructure Cost</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-num">1080x1920</div>
+                <div class="metric-label">Crisp HD 9:16 Vertical Video Output</div>
+            </div>
+        </div>
+
+        <!-- 1. What is this project & Why made -->
+        <div class="card">
+            <div class="card-title">🎯 1. What is This Project & Why Was It Made?</div>
+            <p style="margin-bottom: 1rem; color: #CBD5E1;">
+                Short-form video is the #1 organic audience growth channel. However, editors spend over 2 hours per video scrubbing timelines, keyframing subtitle colors, and manually cropping frames. Commercial SaaS tools charge $50–$80/month for basic auto-clipping.
+            </p>
+            <p style="color: #CBD5E1;">
+                <strong>Auto-Clip & Burn AI</strong> completely automates the workflow with zero subscription fees, providing frame-accurate Whisper AI transcription, engagement scoring, luminous neon karaoke captions, viral top hook banners, and dynamic progress bars.
+            </p>
+            <div class="grid-2" style="margin-top: 1.5rem;">
+                <div style="background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 1.2rem;">
+                    <strong style="color: #FF8E53;">❌ The Traditional Problem</strong>
+                    <ul style="margin-top: 0.6rem; font-size: 0.88rem; padding-left: 1.2rem; color: #E2E8F0;">
+                        <li>2–3 hours manual timeline editing</li>
+                        <li>High recurring software costs</li>
+                        <li>Manual word-by-word subtitle styling</li>
+                        <li>Center cropping cuts off code & slides</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; padding: 1.2rem;">
+                    <strong style="color: var(--cyan);">✅ The Auto-Clip Solution</strong>
+                    <ul style="margin-top: 0.6rem; font-size: 0.88rem; padding-left: 1.2rem; color: #E2E8F0;">
+                        <li>45-second 1-click batch generation</li>
+                        <li>100% Free & Open-Source pipeline</li>
+                        <li>Automated glowing karaoke typography</li>
+                        <li>Fit Canvas mode preserves 100% full screen</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. System Architecture Flowchart -->
+        <div class="card">
+            <div class="card-title">🏗️ 2. System Architecture & Processing Pipeline</div>
+            <div class="mermaid">
+flowchart LR
+    A["🎥 16:9 Video Source<br>(YouTube / MP4)"] --> B["📥 Audio Extractor<br>(16kHz Mono WAV)"]
+    B --> C["🧠 OpenAI Whisper AI<br>(Microsecond Words)"]
+    C --> D["📊 Speech Density<br>Engagement Scorer"]
+    D --> E["✨ ASS Karaoke Engine<br>+ Hook & Progress Bar"]
+    E --> F["✂️ FFmpeg Compositor<br>(Fit Canvas / Crop)"]
+    F --> G["📱 1080x1920 Shorts<br>(TikTok / Reels Ready)"]
+            </div>
+        </div>
+
+        <!-- 3. Target Audiences & Use Cases -->
+        <div class="card">
+            <div class="card-title">💼 3. Real-World Use Cases & Applications</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Creator / Industry</th>
+                        <th>Input Source</th>
+                        <th>Auto-Clip Transformation</th>
+                        <th>Output Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🎙️ Podcasters</strong></td>
+                        <td>45-minute YouTube interview</td>
+                        <td>Extracts top 3 high-speech density debates with Alex Hormozi captions</td>
+                        <td>3 viral shorts generated in 40s</td>
+                    </tr>
+                    <tr>
+                        <td><strong>💻 Tech Developers</strong></td>
+                        <td>30-minute coding livestream</td>
+                        <td>Fit Canvas Mode keeps code and UI 100% visible with dynamic blurred background</td>
+                        <td>Zero text/code cut off</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🏢 Marketing Agencies</strong></td>
+                        <td>Client keynote recordings</td>
+                        <td>Generates 30 days of branded vertical shorts with top viral hook banners</td>
+                        <td>10+ hours saved per client</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🎓 Educators</strong></td>
+                        <td>60-minute recorded lecture</td>
+                        <td>Bitesize micro-learning reels with progress retention bars</td>
+                        <td>Boosts learner retention</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. Technology Stack -->
+        <div class="card">
+            <div class="card-title">🛠️ 4. Technology Stack</div>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Frontend & Studio Layer</h4>
+                    <p style="font-size: 0.9rem; color: #CBD5E1;">Streamlit framework with custom dark glassmorphic CSS, real-time sidebar caption preview, and multi-tab input handling.</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">AI Speech Intelligence</h4>
+                    <p style="font-size: 0.9rem; color: #CBD5E1;">OpenAI Whisper AI engine with greedy fast-path decoding, English optimization, and word-level alignment.</p>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Video Engineering Engine</h4>
+                    <p style="font-size: 0.9rem; color: #CBD5E1;">FFmpeg 7.x multi-threaded pipeline with Lanczos scaling, 36x downscaled boxblur canvas, and ASS subtitle burning.</p>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <h4 style="color: var(--accent); margin-bottom: 0.5rem;">DevOps & Deployment</h4>
+                    <p style="font-size: 0.9rem; color: #CBD5E1;">Fully configured for Streamlit Community Cloud via <code>packages.txt</code> (FFmpeg) and pinned <code>requirements.txt</code>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.85rem;">
+            Auto-Clip & Burn AI • Built for the Social Media Automation Hackathon • <a href="https://github.com/Anurag-tech22/social-media-autoclipper" style="color: var(--accent); text-decoration: none;">GitHub: Anurag-tech22/social-media-autoclipper</a>
+        </footer>
+    </div>
+</body>
+</html>
