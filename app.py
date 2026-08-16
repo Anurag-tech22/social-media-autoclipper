@@ -45,34 +45,46 @@ st.markdown("""
         color: #F8FAFC !important;
     }
     
-    /* Hide Streamlit default Deploy button & menu, keep sidebar toggle accessible */
+    /* Complete removal of Streamlit Cloud header buttons (Share, Star, Edit/Pencil, GitHub, Manage App) */
     #MainMenu {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
-    .stDeployButton {display: none !important;}
-    .stAppDeployButton {display: none !important;}
-    [data-testid="manage-app-button"] {display: none !important;}
+    .stDeployButton, .stAppDeployButton {display: none !important;}
+    [data-testid="stToolbar"], .stToolbar {display: none !important; visibility: hidden !important; opacity: 0 !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="manage-app-button"], .manage-app-button {display: none !important; visibility: hidden !important;}
     [data-testid="stStatusWidget"] {display: none !important;}
-    
+    .viewerBadge, [class*="viewerBadge"], [class*="ViewerBadge"] {display: none !important;}
+    [data-testid="stToolbarActions"], .stToolbarActions {display: none !important;}
     header[data-testid="stHeader"] {
         background: transparent !important;
+        height: 0px !important;
+        min-height: 0px !important;
+    }
+    header[data-testid="stHeader"] .stToolbarActions,
+    header[data-testid="stHeader"] a,
+    header[data-testid="stHeader"] button:not([data-testid="stSidebarCollapsedControl"]):not([data-testid="stSidebarCollapseButton"]) {
+        display: none !important;
+        visibility: hidden !important;
     }
     
+    /* Keep sidebar collapse/expand controls fully accessible */
     [data-testid="stSidebarCollapsedControl"],
     [data-testid="stSidebarCollapseButton"] {
         display: flex !important;
         visibility: visible !important;
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 10px !important;
         padding: 6px !important;
         color: #FFFFFF !important;
+        z-index: 999999 !important;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     [data-testid="stSidebarCollapsedControl"]:hover,
     [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(255, 107, 107, 0.2) !important;
+        background: rgba(255, 107, 107, 0.25) !important;
         border-color: #FF6B6B !important;
-        box-shadow: 0 0 16px rgba(255, 107, 107, 0.3) !important;
+        box-shadow: 0 0 16px rgba(255, 107, 107, 0.4) !important;
     }
     
     /* Hero Banner Styling */
