@@ -45,55 +45,44 @@ st.markdown("""
         color: #F8FAFC !important;
     }
     
-    /* Complete removal of Streamlit Cloud header buttons (Share, Star, Edit/Pencil, GitHub, Manage App) */
+    /* Hide Streamlit default Deploy button, hamburger menu & footer */
     #MainMenu {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
     .stDeployButton, .stAppDeployButton {display: none !important;}
-    [data-testid="stToolbar"], .stToolbar {display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;}
-    [data-testid="stDecoration"] {display: none !important;}
-    [data-testid="manage-app-button"], .manage-app-button {display: none !important; visibility: hidden !important;}
+    [data-testid="manage-app-button"], .manage-app-button {display: none !important;}
     [data-testid="stStatusWidget"] {display: none !important;}
     .viewerBadge, [class*="viewerBadge"], [class*="ViewerBadge"] {display: none !important;}
     [data-testid="stToolbarActions"], .stToolbarActions {display: none !important;}
     
     header[data-testid="stHeader"] {
         background: transparent !important;
-        pointer-events: none !important;
-    }
-    header[data-testid="stHeader"] .stToolbarActions,
-    header[data-testid="stHeader"] a {
-        display: none !important;
-        visibility: hidden !important;
     }
     
-    /* Bulletproof fixed positioning for Sidebar Expand/Collapse Control */
+    /* Ensure Sidebar Collapse & Expand controls are always prominent, visible & clickable */
     [data-testid="stSidebarCollapsedControl"],
     [data-testid="collapsedControl"],
     [data-testid="stSidebarCollapseButton"] {
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
-        pointer-events: auto !important;
-        position: fixed !important;
-        top: 0.85rem !important;
-        left: 0.85rem !important;
-        background: rgba(26, 32, 54, 0.95) !important;
-        border: 1.5px solid rgba(255, 107, 107, 0.6) !important;
-        border-radius: 12px !important;
-        padding: 6px 10px !important;
-        color: #FFFFFF !important;
-        z-index: 9999999 !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 107, 107, 0.3) !important;
-        cursor: pointer !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-    [data-testid="stSidebarCollapsedControl"]:hover,
-    [data-testid="collapsedControl"]:hover,
-    [data-testid="stSidebarCollapseButton"]:hover {
-        background: rgba(255, 107, 107, 0.35) !important;
+    
+    [data-testid="stSidebarCollapsedControl"] button,
+    [data-testid="collapsedControl"] button,
+    [data-testid="stSidebarCollapseButton"] button {
+        background: rgba(26, 32, 54, 0.9) !important;
+        border: 1px solid rgba(255, 107, 107, 0.5) !important;
+        border-radius: 10px !important;
+        color: #FFFFFF !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    [data-testid="stSidebarCollapsedControl"] button:hover,
+    [data-testid="collapsedControl"] button:hover,
+    [data-testid="stSidebarCollapseButton"] button:hover {
+        background: rgba(255, 107, 107, 0.3) !important;
         border-color: #FF6B6B !important;
-        transform: scale(1.08) !important;
-        box-shadow: 0 0 20px rgba(255, 107, 107, 0.6) !important;
+        box-shadow: 0 0 14px rgba(255, 107, 107, 0.5) !important;
     }
     
     /* Hero Banner Styling */
