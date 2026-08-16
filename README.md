@@ -13,8 +13,8 @@
 
 <p align="center">
   <a href="https://social-media-autoclipper.streamlit.app"><strong>🌐 Live Web Studio</strong></a> •
-  <a href="#-quickstart-guide"><strong>⚡ Quickstart</strong></a> •
-  <a href="DEPLOYMENT.md"><strong>🚀 Deployment Manual</strong></a> •
+  <a href="#-how-to-view-test--run-this-project"><strong>🚀 How to Run & View</strong></a> •
+  <a href="DEPLOYMENT.md"><strong>📖 Deployment Manual</strong></a> •
   <a href="PROJECT_OVERVIEW_AND_CHARTS.md"><strong>📊 System Architecture</strong></a> •
   <a href="DEVPOST_SUBMISSION.md"><strong>🏆 Devpost Submission</strong></a>
 </p>
@@ -22,6 +22,53 @@
 ---
 
 </div>
+
+## 🚀 How to View, Test & Run This Project
+
+You can test and explore **Auto-Clip & Burn AI** using any of the following 3 methods:
+
+---
+
+### 🌐 Method 1: Live Cloud Web Studio (Instant 1-Click Access)
+> **Direct Cloud URL**: 👉 **[https://social-media-autoclipper.streamlit.app](https://social-media-autoclipper.streamlit.app)**
+
+1. Open the live cloud URL in any browser.
+2. Choose a creator style preset from the left sidebar (e.g. **Alex Hormozi** or **MrBeast**).
+3. Click the **`🎬 1-Click Demo Podcast`** tab $\rightarrow$ click **`🧪 Select Demo Podcast`** (or drag-and-drop your own `.mp4` file in the **`📁 Upload MP4 / MOV Video`** tab).
+4. Click the glowing button: **`⚡ Generate Viral Vertical Shorts`**.
+5. In **under 25 seconds**, watch all 4 stages run live and download your finished 1080x1920 MP4 vertical short!
+
+---
+
+### 🖥️ Method 2: Localhost Run (On Your Local Computer)
+> **Local URL**: 👉 **[http://localhost:8501](http://localhost:8501)**
+
+Running locally on your machine uses your residential internet connection, allowing you to paste **any YouTube URL** directly without cloud data center bot-checks.
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Anurag-tech22/social-media-autoclipper.git
+cd social-media-autoclipper
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Launch the Studio UI
+streamlit run app.py
+```
+After running the command above, open your browser and navigate to:
+👉 **`http://localhost:8501`**
+
+---
+
+### 🧪 Method 3: Autonomous Command-Line Verification Test
+Verify the complete end-to-end backend processing pipeline (synthetic video creation, Whisper transcription, engagement ranking, Fit Canvas 9:16 compositing, and caption burning) with zero browser or internet requirements:
+```bash
+python test_pipeline.py
+```
+*Expected Output: `✅ Verification Successful: All pipeline stages executed flawlessly!`*
+
+---
 
 ## 📌 1. Executive Summary & The Problem Solved
 
@@ -102,52 +149,7 @@ flowchart TD
 
 ---
 
-## ⚡ 5. Quickstart Guide
-
-### Prerequisites
-- Python 3.10, 3.11, or 3.12
-- FFmpeg installed and available on system PATH
-
-### Installation & Local Run
-```bash
-# 1. Clone the repository
-git clone https://github.com/Anurag-tech22/social-media-autoclipper.git
-cd social-media-autoclipper
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Launch the Studio UI
-streamlit run app.py
-```
-
-Open your browser at **`http://localhost:8501`** to start clipping!
-
-### Autonomous Backend Verification Test
-Verify the complete end-to-end processing pipeline (synthetic video creation, Whisper transcription, engagement ranking, 9:16 rendering, and caption burning) without internet:
-```bash
-python test_pipeline.py
-```
-
----
-
-## 🚀 6. Free Cloud Deployment (Streamlit Community Cloud)
-
-Deploy directly to **Streamlit Community Cloud** with **$0 infrastructure cost**:
-
-1. Push this repository to GitHub.
-2. Go to **[share.streamlit.io](https://share.streamlit.io)** and click **New app**.
-3. Select your repository: `Anurag-tech22/social-media-autoclipper`.
-4. Set Main file path to `app.py`.
-5. Click **Deploy!**.
-
-*The app automatically installs system dependencies (`ffmpeg`, `nodejs`) from `packages.txt` and Python packages from `requirements.txt`.*
-
-👉 **Read the full [Deployment Guide (DEPLOYMENT.md)](DEPLOYMENT.md)**.
-
----
-
-## 📂 7. Project File Structure
+## 📂 5. Project File Structure
 
 ```text
 social-media-autoclipper/
@@ -171,7 +173,7 @@ social-media-autoclipper/
 
 ---
 
-## 🏆 8. Hackathon Evaluation Rubric Mapping
+## 🏆 6. Hackathon Evaluation Rubric Mapping
 
 | Evaluation Criteria | Weight | Why Auto-Clip & Burn AI Scores Top Marks |
 | :--- | :--- | :--- |
@@ -182,7 +184,7 @@ social-media-autoclipper/
 
 ---
 
-## 👤 9. Team & Attribution (Solo Developer)
+## 👤 7. Team & Attribution (Solo Developer)
 
 - **Creator & Developer**: Anurag (`Anurag-tech22`)
 - **Role**: Full-Stack AI Engineer & Video Architect
@@ -190,6 +192,6 @@ social-media-autoclipper/
 
 ---
 
-## 📄 10. License
+## 📄 8. License
 
 Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete details.
