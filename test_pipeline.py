@@ -12,27 +12,43 @@ from src.downloader import extract_audio
 from src.transcriber import transcribe_audio, extract_words_from_transcript, find_top_engaging_segments
 from src.video_processor import process_vertical_short, get_video_info
 
-def generate_tts_audio_windows(text: str, output_wav_path: str):
+import shutil
+import platform
+
+def generate_tts_audio(text: str, output_wav_path: str):
     """
-    Generate realistic human speech audio on Windows using System.Speech.Synthesis
-    without requiring third-party cloud APIs.
+    Generate speech audio across Windows, Linux (Streamlit Cloud), and macOS.
+    Uses System.Speech on Windows PowerShell if available, or FFmpeg synthetic audio on Linux/Cloud.
     """
-    clean_text = text.replace('"', '""').replace("'", "''")
-    ps_cmd = f"""
-    Add-Type -AssemblyName System.Speech
-    $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
-    $synth.Rate = 0
-    $synth.SetOutputToWaveFile('{output_wav_path}')
-    $synth.Speak("{clean_text}")
-    $synth.Dispose()
-    """
-    res = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd], capture_output=True, text=True)
-    if res.returncode != 0 or not os.path.exists(output_wav_path):
-        # Fallback to generating a simple test audio using ffmpeg sine wave
+    os.makedirs(Path(output_wav_path).parent, exist_ok=True)
+    generated = False
+    
+    # 1. Try Windows PowerShell Speech Synthesizer if running on Windows
+    if platform.system() == "Windows" and shutil.which("powershell"):
+        try:
+            clean_text = text.replace('"', '""').replace("'", "''")
+            ps_cmd = f"""
+            Add-Type -AssemblyName System.Speech
+            $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
+            $synth.Rate = 0
+            $synth.SetOutputToWaveFile('{output_wav_path}')
+            $synth.Speak("{clean_text}")
+            $synth.Dispose()
+            """
+            res = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd], capture_output=True, text=True, timeout=15)
+            if res.returncode == 0 and os.path.exists(output_wav_path) and os.path.getsize(output_wav_path) > 1000:
+                generated = True
+        except Exception:
+            generated = False
+
+    # 2. Universal Cross-Platform Fallback using FFmpeg (Runs seamlessly on Linux, Streamlit Cloud & Mac)
+    if not generated or not os.path.exists(output_wav_path) or os.path.getsize(output_wav_path) < 500:
         ffmpeg_exe = setup_ffmpeg_path()
         subprocess.run([
             ffmpeg_exe, "-y", "-f", "lavfi",
-            "-i", "sine=frequency=440:duration=15",
+            "-i", "aevalsrc=sin(440*2*PI*t)*0.3+sin(880*2*PI*t)*0.1:s=16000:d=30",
+            "-ar", "16000",
+            "-ac", "1",
             output_wav_path
         ], capture_output=True)
 
@@ -50,7 +66,7 @@ def create_synthetic_test_video(output_video_path: str, duration: float = 30.0) 
         "Artificial intelligence is transforming content creation for millions of creators worldwide. "
         "With one click, you can turn any long video into viral vertical clips with instant captions!"
     )
-    generate_tts_audio_windows(spoken_script, wav_path)
+    generate_tts_audio(spoken_script, wav_path)
     
     # 2. Render 16:9 test video with gradient background and animated counter + audio
     cmd = [
