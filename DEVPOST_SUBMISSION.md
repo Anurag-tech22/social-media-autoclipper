@@ -9,8 +9,8 @@
 
 - **Project Name**: Auto-Clip & Burn AI
 - **Tagline**: Convert 20-min YouTube videos & podcasts into viral 9:16 Shorts with AI hook headlines & animated captions in 60 seconds.
-- **Project URL**: `https://<your-username>-social-media-autoclipper.streamlit.app`
-- **GitHub Repository**: `https://github.com/<your-username>/social-media-autoclipper`
+- **Project URL**: `https://social-media-autoclipper2.streamlit.app`
+- **GitHub Repository**: `https://github.com/Anurag-tech22/social-media-autoclipper`
 
 ---
 

@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <a href="https://social-media-autoclipper.streamlit.app"><strong>🌐 Live Web Studio</strong></a> •
+  <a href="https://social-media-autoclipper2.streamlit.app"><strong>🌐 Live Web Studio</strong></a> •
   <a href="#-how-to-view-test--run-this-project"><strong>🚀 How to Run & View</strong></a> •
   <a href="DEPLOYMENT.md"><strong>📖 Deployment Manual</strong></a> •
   <a href="PROJECT_OVERVIEW_AND_CHARTS.md"><strong>📊 System Architecture</strong></a> •
@@ -30,7 +30,7 @@ You can test and explore **Auto-Clip & Burn AI** using any of the following 3 me
 ---
 
 ### 🌐 Method 1: Live Cloud Web Studio (Instant 1-Click Access)
-> **Direct Cloud URL**: 👉 **[https://social-media-autoclipper.streamlit.app](https://social-media-autoclipper.streamlit.app)**
+> **Direct Cloud URL**: 👉 **[https://social-media-autoclipper2.streamlit.app](https://social-media-autoclipper2.streamlit.app)**
 
 1. Open the live cloud URL in any browser.
 2. Choose a creator style preset from the left sidebar (e.g. **Alex Hormozi** or **MrBeast**).
