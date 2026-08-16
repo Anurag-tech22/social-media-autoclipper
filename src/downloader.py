@@ -6,7 +6,8 @@ from src.utils import get_temp_dir, setup_ffmpeg_path
 
 def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]:
     """
-    Download a YouTube video given its URL using yt-dlp with multi-tiered anti-403 client fallback.
+    Download a YouTube video given its URL using yt-dlp with TLS browser impersonation
+    and multi-tiered player client fallbacks to bypass datacenter 403 blocks.
     Returns:
         tuple[str, dict]: (local_video_path, metadata_dict)
     """
@@ -18,11 +19,25 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
     
     out_template = os.path.join(output_dir, "%(id)s.%(ext)s")
     
-    # 4-Tier Client Waterfall to completely bypass YouTube 403 Forbidden on cloud datacenters
     strategies = [
-        # Strategy 1: TV Embedded & Android Single Stream (Bypasses Bot Checks on Datacenter IPs)
+        # Strategy 1: Genuine Chrome Browser Impersonation with Web Player Client
         {
-            'format': '18/22/best[height<=720]/best[ext=mp4]/best',
+            'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720]/best[ext=mp4]/best',
+            'outtmpl': out_template,
+            'merge_output_format': 'mp4',
+            'noplaylist': True,
+            'quiet': True,
+            'no_warnings': True,
+            'impersonate': 'chrome',
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['web', 'mweb'],
+                }
+            }
+        },
+        # Strategy 2: Android VR & Web Client (High compatibility without po-token)
+        {
+            'format': 'best[height<=720]/best/18',
             'outtmpl': out_template,
             'merge_output_format': 'mp4',
             'noplaylist': True,
@@ -30,29 +45,11 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
             'no_warnings': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['tv_embedded', 'android', 'ios'],
+                    'player_client': ['android_vr', 'web'],
                 }
             }
         },
-        # Strategy 2: Android Creator & iOS Mobile API
-        {
-            'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': out_template,
-            'merge_output_format': 'mp4',
-            'noplaylist': True,
-            'quiet': True,
-            'no_warnings': True,
-            'http_headers': {
-                'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; U; Android 11; Pixel 5)',
-                'Accept-Language': 'en-US,en;q=0.9',
-            },
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['android_creator', 'android'],
-                }
-            }
-        },
-        # Strategy 3: Mobile Web (mweb) Fallback
+        # Strategy 3: Mobile Web & Android Creator fallback
         {
             'format': 'best[ext=mp4]/best',
             'outtmpl': out_template,
@@ -60,11 +57,11 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
             'noplaylist': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['mweb', 'web_creator'],
+                    'player_client': ['mweb', 'android_creator'],
                 }
             }
         },
-        # Strategy 4: Standard best stream fallback
+        # Strategy 4: Direct best fallback
         {
             'format': 'best/18/worst',
             'outtmpl': out_template,
@@ -76,7 +73,7 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
     info = None
     last_err = None
     
-    for idx, strat in enumerate(strategies):
+    for strat in strategies:
         try:
             with yt_dlp.YoutubeDL(strat) as ydl:
                 info = ydl.extract_info(url, download=True)
@@ -87,7 +84,7 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
             continue
             
     if not info:
-        raise RuntimeError(f"YouTube download failed across all fallback clients. Error: {last_err}")
+        raise RuntimeError(f"YouTube download failed: {last_err}")
             
     video_id = info.get('id', 'video')
     ext = info.get('ext', 'mp4')
