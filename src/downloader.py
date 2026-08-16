@@ -6,7 +6,7 @@ from src.utils import get_temp_dir, setup_ffmpeg_path
 
 def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]:
     """
-    Download a YouTube video given its URL using yt-dlp with anti-403 client fallback.
+    Download a YouTube video given its URL using yt-dlp with multi-tiered anti-403 client fallback.
     Returns:
         tuple[str, dict]: (local_video_path, metadata_dict)
     """
@@ -18,46 +18,76 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
     
     out_template = os.path.join(output_dir, "%(id)s.%(ext)s")
     
-    # Primary anti-403 options using Android/iOS player clients
-    ydl_opts = {
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best/18/22',
-        'outtmpl': out_template,
-        'merge_output_format': 'mp4',
-        'noplaylist': True,
-        'quiet': True,
-        'no_warnings': True,
-        'retries': 5,
-        'fragment_retries': 5,
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept-Language': 'en-US,en;q=0.9',
-        },
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['android', 'ios', 'web_creator', 'web'],
-                'player_skip': ['webpage', 'configs'],
+    # 4-Tier Client Waterfall to completely bypass YouTube 403 Forbidden on cloud datacenters
+    strategies = [
+        # Strategy 1: TV Embedded & Android Single Stream (Bypasses Bot Checks on Datacenter IPs)
+        {
+            'format': '18/22/best[height<=720]/best[ext=mp4]/best',
+            'outtmpl': out_template,
+            'merge_output_format': 'mp4',
+            'noplaylist': True,
+            'quiet': True,
+            'no_warnings': True,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['tv_embedded', 'android', 'ios'],
+                }
             }
         },
-    }
-    
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-    except Exception as e:
-        # Fallback without specific player_skip if first attempt failed
-        fallback_opts = {
+        # Strategy 2: Android Creator & iOS Mobile API
+        {
+            'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'outtmpl': out_template,
+            'merge_output_format': 'mp4',
+            'noplaylist': True,
+            'quiet': True,
+            'no_warnings': True,
+            'http_headers': {
+                'User-Agent': 'com.google.android.youtube/19.09.37 (Linux; U; Android 11; Pixel 5)',
+                'Accept-Language': 'en-US,en;q=0.9',
+            },
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android_creator', 'android'],
+                }
+            }
+        },
+        # Strategy 3: Mobile Web (mweb) Fallback
+        {
             'format': 'best[ext=mp4]/best',
             'outtmpl': out_template,
             'merge_output_format': 'mp4',
             'noplaylist': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['mweb', 'android'],
+                    'player_client': ['mweb', 'web_creator'],
                 }
             }
+        },
+        # Strategy 4: Standard best stream fallback
+        {
+            'format': 'best/18/worst',
+            'outtmpl': out_template,
+            'noplaylist': True,
+            'no_warnings': True
         }
-        with yt_dlp.YoutubeDL(fallback_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
+    ]
+    
+    info = None
+    last_err = None
+    
+    for idx, strat in enumerate(strategies):
+        try:
+            with yt_dlp.YoutubeDL(strat) as ydl:
+                info = ydl.extract_info(url, download=True)
+                if info:
+                    break
+        except Exception as e:
+            last_err = e
+            continue
+            
+    if not info:
+        raise RuntimeError(f"YouTube download failed across all fallback clients. Error: {last_err}")
             
     video_id = info.get('id', 'video')
     ext = info.get('ext', 'mp4')
@@ -66,7 +96,7 @@ def download_youtube_video(url: str, output_dir: str = None) -> tuple[str, dict]
         video_path = os.path.join(output_dir, f"{video_id}.mp4")
         
     metadata = {
-        'title': info.get('title', 'Unknown Title'),
+        'title': info.get('title', 'YouTube Video'),
         'duration': info.get('duration', 0),
         'uploader': info.get('uploader', 'Unknown Creator'),
         'thumbnail': info.get('thumbnail', ''),

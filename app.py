@@ -473,9 +473,15 @@ if generate_btn:
                     
                 elif video_source_type == "youtube" and youtube_url:
                     status_text.markdown(f"📥 **Downloading YouTube video:** `{youtube_url}`...")
-                    source_video_path, meta = download_youtube_video(youtube_url, str(temp_dir / "yt"))
-                    video_title = meta.get("title", "YouTube Video")
-                    st.session_state.video_meta = meta
+                    try:
+                        source_video_path, meta = download_youtube_video(youtube_url, str(temp_dir / "yt"))
+                        video_title = meta.get("title", "YouTube Video")
+                        st.session_state.video_meta = meta
+                    except Exception as yt_err:
+                        st.error("⚠️ **YouTube Cloud Bot-Check Notice**: YouTube has temporarily restricted automated cloud datacenter IPs for this specific video stream.\n\n👉 **Quick Solution**: Please use the **📁 Upload MP4 / MOV Video** tab (or test immediately with the **🎬 1-Click Demo Podcast** tab) to generate your viral vertical shorts without interruption!")
+                        progress_bar.empty()
+                        status_text.empty()
+                        st.stop()
                     
                 elif video_source_type == "demo" or st.session_state.demo_active:
                     from test_pipeline import create_synthetic_test_video
